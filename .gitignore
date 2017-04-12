@@ -89,5 +89,4 @@ ENV/
 # Rope project settings
 .ropeproject
 
-*.txt
 *.txt~
