@@ -42,6 +42,14 @@ class WebhoseUtil():
             raise Exception("should request first")
         return self.output['posts'][postNum]['title']
     
+    def getMultiTitles(self, numOfPosts):
+        if(self.output is None):
+            raise Exception("should request first")
+        output = []
+        for i in range(numOfPosts):
+            output.append(self.output['posts'][i]['title'])
+        return output
+    
     def getText(self, postNum):
         if(self.output is None):
             raise Exception("should request first")
@@ -100,6 +108,11 @@ if __name__ == "__main__":
                 print("Missing arg")
                 continue
             print(wh.getTitle(int(m.split(" ")[1])))
+        elif(command == 'titles'):
+            if(len(m.split(" "))<2):
+                print("Missing arg")
+                continue
+            print(wh.getMultiTitles(int(m.split(" ")[1])))
         elif(command == 'site'):
             if(len(m.split(" "))<2):
                 print("Missing arg")
