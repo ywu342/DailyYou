@@ -1,10 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-<<<<<<< HEAD
+
 from django.contrib.auth.decorators import login_required
-=======
 from .models import Category, User
->>>>>>> 4903c1f90c35bd46f11b4d57773f789231361049
+
 
 # Create your views here.
 
