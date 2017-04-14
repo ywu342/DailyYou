@@ -4,9 +4,20 @@ from .models import Category, User
 
 # Create your views here.
 def index(request):
-    __rmCateFromUser('yaling', 'sports')
-    output = ','.join(__getUserCates('yaling'))
+    u = User.objects.get(username="yaling")
+    u.rmCateFromUser('sports')
+    #u.addCateToUser('sports')
+    output = ','.join(u.getUserCates())
     return HttpResponse("All cates for yaling in db: "+output)
+
+def profile(request):
+    return HttpResponse("profile page")
+
+def downloadPDF(request):
+    return HttpResponse("download pdf page")
+
+def generateNewspaper(request):
+    return HttpResponse("Newspaper page")
 
 # private helper functions to communicate with the db
 def __addCateToUser(user_name, cate):
