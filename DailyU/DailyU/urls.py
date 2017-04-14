@@ -15,8 +15,12 @@ Including another URLconf
 """
 from django.conf.urls import url,include
 from django.contrib import admin
+#from django.contrib.auth import views as auth_views
+#from news import forms
 
 urlpatterns = [
-    url(r'^news/', include('news.urls')),
+    url(r'^news/',include('news.urls')),
     url(r'^admin/', admin.site.urls),
+   
+
 ]
