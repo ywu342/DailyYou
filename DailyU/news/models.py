@@ -13,7 +13,7 @@ class Category(models.Model):
 class User(models.Model):
     username = models.CharField(max_length=200,primary_key=True)
     password = models.CharField(max_length=200)
-    categories = models.ManyToManyField(Category)
+    categories = models.ManyToManyField(Category,blank=True)
     
     def addCateToUser(self, cate):
         category = Category.objects.get(cate_name=cate)

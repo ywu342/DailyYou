@@ -156,4 +156,4 @@ TEMPLATE_DIRS = (
 )
 '''
 # Login success redirection
-LOGIN_REDIRECT_URL = '/news'
+LOGIN_REDIRECT_URL = '/'
