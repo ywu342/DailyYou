@@ -1,14 +1,6 @@
-{% extends 'base.html' %}
+{% load el_pagination_tags %}
 
-{% block content %}
-        <div class="page-header">
-            <h1><a href="{% url 'sections' %}">Recent <em>{{ section_name }}</em> news</h1>
-        </div>
-
-
-<div class="content container">
-    <div class="row">
-        <div class="col-md-8">
+{% paginate posts %}
             {% for post in posts %}
             <div class="post">
                 <div class="date">
@@ -18,10 +10,4 @@
                 <p>{{ post.text|linebreaksbr }}</p>
             </div>
             {% endfor %}
-        </div>
-    </div>
-</div>
-
-
-
-{% endblock %}
+{% show_more %}

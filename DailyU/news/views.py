@@ -5,9 +5,11 @@ from django.template import RequestContext
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from .models import Category, User
+#from el_pagination.views import AjaxListView
 from .webhoseUtil import WebhoseUtil
 import os
 import sys
+
 
 # Create your views here.
 
@@ -64,11 +66,17 @@ def editCategory(request):
 def downloadPDF(request):
     return HttpResponse("download pdf page")
 
-def generateNewspaper(request):
+def newspaperIndex(request):
+    cur_user = getCurrentUser(request)
+    sections = cur_user.getUserCates()
+    return render(request, "sections.html", {'sections':sections})
+
+def generateNewspaper(request,section_name):#,page_template='post_list_page.html'):
     wh = WebhoseUtil()
     '''For development purpose, load existing json'''
-    #wh.request("entertainment")
-    file_path = os.path.join(os.path.dirname(__file__), 'test_jsons/sports.json')
+    #print(section_name)
+    #wh.request(section_name)
+    file_path = os.path.join(os.path.dirname(__file__), 'test_jsons/'+section_name+'.json')
     wh.loadJson(file_path)
     posts = []
     for i in range(10):
@@ -83,4 +91,13 @@ def generateNewspaper(request):
                       "text": text,
                       "author": author,
                       "pub_time": pub_time})
-    return render(request, "post_list.html", {'posts': posts})
+    context = {
+        'posts': posts,
+        'section_name':section_name,
+        #'page_template': page_template,
+    }
+#     if request.is_ajax():
+#         template = page_template
+    return render_to_response(
+        "post_list.html", context, request)
+    #return render(request, "post_list.html", {'posts': posts, 'section_name':section_name})
