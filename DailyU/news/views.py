@@ -67,7 +67,8 @@ def editCategory(request):
         new_category_name = request.POST.get('new_cat',False)
         if len(Category.objects.filter(cate_name=new_category_name)) == 0:
             new_category = Category.objects.create(cate_name=new_category_name)
-            user.addCateToUser(new_category_name)
+        user.addCateToUser(new_category_name)
+        return HttpResponseRedirect("/")
         
     elif 'delete_cat' in request.POST:
         delete_cat_name = request.POST.get('new_cat',False)
