@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+        <div class="page-header">
+            <h1>Recent news</a></h1>
+        </div>
+
+{% for post in posts %}
+<div class="content container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="post">
+                <div class="date">
+                <p>published: {{ post.pub_time }}</p>
+                </div>
+                <h1><a href="{{ post.post_url }}">{{ post.title }}</a></h1>
+                <p>{{ post.text|linebreaksbr }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endfor %}
+
+{% endblock %}

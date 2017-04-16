@@ -9,6 +9,6 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^login/', views.login,name='login'),
     url(r'^logout/', auth_views.logout, {'next_page':'/login'},name='logout'),
+    url(r'^posts/',views.generateNewspaper,name='posts'),
     url(r'^editcat/', views.editCategory, name='editcat')
-    
 ]
