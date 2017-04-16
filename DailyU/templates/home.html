@@ -8,6 +8,68 @@
             <h1>Hello, {{ user.username }}</h1>
             <p>Below are the categories you have selected</p>
         </div>
+
     </div>
 </div>
+
+ <div class="container">
+ <form method="post" action="{% url 'editcat' %}">
+			{% csrf_token %}
+    <div class="row clearfix">
+		<div class="col-md-12 column">
+			
+			<table class="table table-bordered table-hover" id="tab_logic">
+				<thead>
+					<tr >
+						<th class="text-center">
+							#
+						</th>
+						<th class="text-center">
+							Current Categories
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr id='addr0'>
+						<td>
+						1
+						</td>
+						<td>
+						<input type="text" name='name0'  placeholder='Name' class="form-control"/>
+						</td>
+
+					</tr>
+                    <tr id='addr1'></tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<button id="add_row" class="btn btn-default pull-left" type="submit" value="add_row">Add Row</button>
+	<button id='delete_row' class="pull-right btn btn-default" type="submit" value="delete_row">Delete Row</button>
+	</form>
+</div>
 {% endblock %}
+
+{% block javascript %}
+
+<script>
+
+ $(document).ready(function(){
+      var i=1;
+     $("#add_row").click(function(){
+      $('#addr'+i).html("<td>"+ (i+1) +"</td><td><input name='name"+i+"' type='text' placeholder='Name' class='form-control input-md'  /> </td>");
+
+      $('#tab_logic').append('<tr id="addr'+(i+1)+'"></tr>');
+      i++; 
+  });
+     $("#delete_row").click(function(){
+    	 if(i>1){
+		 $("#addr"+(i-1)).html('');
+		 i--;
+		 }
+	 });
+
+});
+</script>
+{% endblock %}
+
