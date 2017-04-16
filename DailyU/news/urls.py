@@ -9,5 +9,5 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^login/', auth_views.login, {'template_name':'login.html', 'authentication_form':forms.LoginForm},name='login'),
     url(r'^logout/', auth_views.logout, {'next_page':'/login'},name='logout'),
-    
+    url(r'^posts/',views.generateNewspaper,name='posts'),
 ]
