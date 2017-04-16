@@ -2,16 +2,24 @@
 
 {% block content %}
         <div class="page-header">
-            <h1><a href="{% url 'sections' %}">Recent <em>{{ section_name }}</em> news</h1>
+            <h1><a href="{% url 'sections' %}">Recent news</a></h1>
         </div>
+<ul class="breadcrumb">
+        {% for section in sections %}
+        {% ifequal section section_name %}
+            <li class="active">
+                {{section_name}}
+            </li>
+        {% endifequal %}
+        {% ifnotequal section section_name %}
+            <li><a href="{% url 'posts' section %}">{{section}}</a></li>
+        {% endifnotequal %}
+        {% endfor %}
+</ul>
 
 
 <div class="content container" >
-    <div class="row">
-        <div class="col-md-8">
 {% include page_template %}
-        </div>
-    </div>
 </div>
 {% endblock %}
 

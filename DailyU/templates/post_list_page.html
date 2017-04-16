@@ -1,13 +1,28 @@
 {% load el_pagination_tags %}
 
+<div class="col-md-12">
 {% paginate posts %}
-            {% for post in posts %}
-            <div class="post">
-                <div class="date">
-                <p>published: {{ post.pub_time }}</p>
-                </div>
-                <h1><a href="{{ post.post_url }}">{{ post.title }}</a></h1>
-                <p>{{ post.text|linebreaksbr }}</p>
-            </div>
-            {% endfor %}
+
+    {% for post in posts %}
+    <div class="row post">
+
+		<div >
+		    <div class="date">
+		    	<p>published: {{ post.pub_time }}</p>
+		    </div>
+		    <h1><a href="{{ post.post_url }}">{{ post.title }}</a></h1>
+		    <div class="row" style="height: 300px;overflow: hidden;">
+				{% if post.img|length > 0 %}
+				<div class="col-md-4">
+					<img src="{{post.img}}" style="width:100%;height:100%;object-fit:contain;"/>
+				</div>
+				{% endif %}
+		    	<p>{{ post.text|linebreaksbr }}</p>
+		    </div>
+		</div>
+    </div>
+    {% endfor %}
+
 {% show_more %}
+
+</div>

@@ -18,6 +18,11 @@ h1, h2, h3, h4 {
     font-family: 'Lobster', cursive;
 }
 
+p {
+	font-family: 'Verdana';
+	font-style: normal;
+}
+
 .date {
     color: #828282;
 }

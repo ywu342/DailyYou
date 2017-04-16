@@ -70,17 +70,33 @@ def downloadPDF(request):
 def newspaperIndex(request):
     cur_user = getCurrentUser(request)
     sections = cur_user.getUserCates()
-    return render(request, "sections.html", {'sections':sections})
+    sup_sections = []
+    wh = WebhoseUtil()
+    for s in sections:
+        '''For development purpose, load existing json'''
+        #wh.request(s)
+        file_path = os.path.join(os.path.dirname(__file__), 'test_jsons/'+s+'.json')
+        #wh.saveToFile(file_path)
+        wh.loadJson(file_path)
+        text = ""
+        for i in range(10):
+            title = wh.getTitle(i)
+            text = text+str(i+1)+". "+title+"\n"
+        text = text+"More to be explored..."
+        sup_sections.append({"name":s,"text":text})
+    return render(request, "sections.html", {'sections':sup_sections})
 
 @page_template('post_list_page.html')
 def generateNewspaper(request,section_name,extra_context=None):
+    cur_user = getCurrentUser(request)
+    sections = cur_user.getUserCates()
     wh = WebhoseUtil()
     '''For development purpose, load existing json'''
     #wh.request(section_name)
     file_path = os.path.join(os.path.dirname(__file__), 'test_jsons/'+section_name+'.json')
     wh.loadJson(file_path)
     posts = []
-    for i in range(40):
+    for i in range(wh.numOfPosts()):
         title = wh.getTitle(i)
         post_url = wh.getUrl(i)
         img = wh.getImg(i)
@@ -91,9 +107,11 @@ def generateNewspaper(request,section_name,extra_context=None):
                       "post_url": post_url,
                       "text": text,
                       "author": author,
-                      "pub_time": pub_time})
+                      "pub_time": pub_time,
+                      "img" : img})
     context = {
         'posts': posts,
+        'sections' : sections,
         'section_name':section_name,
         'page_template': page_template,
     }
