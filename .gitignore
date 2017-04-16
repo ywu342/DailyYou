@@ -5,6 +5,7 @@ __pycache__/
 *.py~
 *.pydevproject
 *.project
+*.css~
 
 # C extensions
 *.so

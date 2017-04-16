@@ -2,21 +2,12 @@
 
 
 {% block content %}
-    {% if form.errors %}
+    {% if err %}
 
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
 
-{% if next %}
-    {% if user.is_authenticated %}
 
-<p>Your account doesn't have access to this page. To proceed,
-    please login with an account that has access.</p>
-    {% else %}
-
-<p>Please login to see this page.</p>
-    {% endif %}
-{% endif %}
 
 <div class="container">
     <div class="row">
@@ -26,20 +17,27 @@
                     <h3 class="panel-title">Please Sign In</h3>
                 </div>
                 <div class="panel-body">
-                    <form method="post" action="{% url 'login' %}">
+                    <form method="POST" action="{% url 'login' %}">
 {% csrf_token %}
 
                         <p class="bs-component">
-                            <table>
-                                <tr>
-                                    <td>{{ form.username.label_tag }}</td>
-                                    <td>{{ form.username }}</td>
-                                </tr>
-                                <tr>
-                                    <td>{{ form.password.label_tag }}</td>
-                                    <td>{{ form.password }}</td>
-                                </tr>
-                            </table>
+
+                            <div class="control-group">
+                  <!-- username -->
+                <label class="control-label" for="username">username</label>
+                  <div class="controls">
+                    <input type="text" id="username" name="username" placeholder="" class="type-in">
+                  </div>
+                </div>
+
+              <div class="control-group">
+                  <!-- Password-->
+                <label class="control-label" for="password">password</label>
+                  <div class="controls">
+                    <input type="password" id="password" name="password" placeholder="" class="type-in">
+                  </div>
+                </div>
+
                         </p>
                         <p class="bs-component">
                             <center>
@@ -60,7 +58,7 @@
 
 
 <script>
-{% if not user.is_authenticated %}
+{% if user != None %}
 $("ul.nav.navbar-nav.navbar-right").css("display","none");
 {% endif %}
 </script>

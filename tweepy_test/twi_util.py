@@ -1,7 +1,18 @@
 import tweepy as tp
+import pandas as pd
+import re
 import sys
 import os
 
+def words_in_text(words,text):
+        text = text.lower()
+        for w in words:
+            w = w.lower()
+            match = re.search(word,text)
+            if not match:
+                return False
+        return True
+    
 class twi_util():
 
     def __init__(self):
@@ -11,6 +22,7 @@ class twi_util():
         self.api_secret = "srxUZe6xy8xyQbsonNFQW8mGlLPRL1XvIPlW88WSqs7dgUsybq"
         self.auth = None
         self.api = None
+        self.keyword_list = []
 
     def oauth_api(self):
         self.auth = tp.OAuthHandler(self.api_key,self.api_secret)
@@ -25,9 +37,7 @@ class twi_util():
             sys.exit(-1)
 
 
-    def search_keyword(self,word,maxTweets,tweetsPerQry=100,sinceId=None,maxId=sys.maxsize):
-        if tweetsPerQry > 100:
-            tweetsPerQry = 100
+    def search_keyword(self,word,maxTweets,tweetsPerQry,sinceId,maxId):
         result = []
         tw_count = 0
         while tw_count < maxTweets:
@@ -58,41 +68,55 @@ class twi_util():
 
         return result
 
+    def get_all_related_tweets(self,textonly=True,word_list,maxTweets,tweetsPerQry=100,sinceId=None,maxId=sys.maxsize):
+        if tweetsPerQry > 100:
+            tweetsPerQry = 100
+        result_list = []
+        self.keyword_list = word_list
+
+        for word in word_list:
+            tweets_json = self.search_keyword(word,maxTweets,tweetsPerQry,sinceId,maxId)
+            if textonly:
+                for tw in tweets_json:
+                    #return as list of lists
+                    #result_list.append(tw['text'])
+
+                    #return as a whole list
+                    result_list += tw['text']
+            else:
+                #return as list of lists
+                #result_list.append(tweets_json)
+                result_list += tweets_json
+        #return as a whole list
+        return result_list
+
+
+
     
+# This can only be used with textonly
+    def most_relevant(self,twlist,return_num):
+        num_keywords = len(self.word_list)
+        wordlist = self.word_list
+        tweet_df = pd.DataFrame()
+        tweet_df['text'] = twlist
+        relevant_tweets = []
+        while num_keywords>0:
+            tweet_df['relevant'] = tweet_df['text'].apply(\
+                lambda tweet:words_in_text(wordlist,tweet))
+            relevant_tweets = tweet_df[tweet_df['relevant']== True] 
+            if len(relevant_tweets) < return_num:
+                wordlist = wordlist[:-1]
+                num_keywords -= 1
+                tweet_df.drop('relevant',axis=1)
+            else:
+                break
+        return relevant_tweets[:return_num]
 
 
-    def most_relevant(self,)
 
 
-
-
-
-
-
-
-
-
-
-class StdOutListener(tp.StreamListener):
-
-    def on_data(self,data):
-        print (data)
-        return True
-
-    def on_error(self,status):
-        print (status)
 
 if __name__ == '__main__':
 
-    lis = StdOutListener()
-    auth = tp.OAuthHandler(consumer_key,consumer_secret)
-    auth.set_access_token(access_token,access_token_secret)
-    #stream = tp.Stream(auth,lis)
-
-    #stream.filter(track=['python','django','java','c++'])
-    api = tp.API(auth)
-    follower = tp.Cursor(api.followers,'krachik').items(10)
-    first_friend = follower.next().screen_name
-    #friend_posts = tp.Cursor(api.user_timeline(),'krachik').items(10)
-    friend_posts = api.user_timeline(screen_name=first_friend, count=10)
+   
 
