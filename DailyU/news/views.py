@@ -90,7 +90,7 @@ def newspaperIndex(request):
         #wh.saveToFile(file_path)
         wh.loadJson(file_path)
         text = ""
-        for i in range(10):
+        for i in range(min(10,wh.numOfPosts())):
             title = wh.getTitle(i)
             text = text+str(i+1)+". "+title+"\n"
         text = text+"More to be explored..."
