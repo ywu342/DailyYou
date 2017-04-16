@@ -12,63 +12,110 @@
     </div>
 </div>
 
+ 
  <div class="container">
- <form method="post" action="{% url 'editcat' %}">
+	<form method="post" action="{% url 'editcat' %}">
 			{% csrf_token %}
     <div class="row clearfix">
-		<div class="col-md-12 column">
-			
-			<table class="table table-bordered table-hover" id="tab_logic">
+    	<div class="col-md-12 table-responsive">
+			<table class="table table-bordered table-hover table-sortable" id="tab_logic">
 				<thead>
 					<tr >
 						<th class="text-center">
-							#
-						</th>
-						<th class="text-center">
 							Current Categories
+						</th>
+						
+        				<th class="text-center" style="border-top: 1px solid #ffffff; border-right: 1px solid #ffffff;">
 						</th>
 					</tr>
 				</thead>
 				<tbody>
-					<tr id='addr0'>
-						<td>
-						1
+    				<tr id='addr0' data-id="0" >
+						<td data-name="name">
+						    <input type="text" name='new_cat'  placeholder='Name' class="form-control"/>
 						</td>
-						<td>
-						<input type="text" name='name0'  placeholder='Name' class="form-control"/>
-						</td>
-
+						
+    					
+                        <td data-name="del">
+                            <button name="delete_cat" type="submit" class='btn btn-danger row-remove'>delete</button>
+                        </td>
 					</tr>
-                    <tr id='addr1'></tr>
 				</tbody>
 			</table>
 		</div>
 	</div>
-	<button id="add_row" class="btn btn-default pull-left" type="submit" value="add_row">Add Row</button>
-	<button id='delete_row' class="pull-right btn btn-default" type="submit" value="delete_row">Delete Row</button>
+	<button id="add_cat" name="add_cat" class="btn btn-default pull-left" type="submit" value="add_cat">Add Category</button>
 	</form>
 </div>
+
 {% endblock %}
 
 {% block javascript %}
 
 <script>
 
- $(document).ready(function(){
-      var i=1;
-     $("#add_row").click(function(){
-      $('#addr'+i).html("<td>"+ (i+1) +"</td><td><input name='name"+i+"' type='text' placeholder='Name' class='form-control input-md'  /> </td>");
+ $(document).ready(function() {
+    $("#add_row").on("click", function() {
+        // Dynamic Rows Code
+        
+        // Get max row id and set new id
+        var newid = 0;
+        $.each($("#tab_logic tr"), function() {
+            if (parseInt($(this).data("id")) > newid) {
+                newid = parseInt($(this).data("id"));
+            }
+        });
+        newid++;
+        
+        var tr = $("<tr></tr>", {
+            id: "addr"+newid,
+            "data-id": newid
+        });
+        
+        // loop through each td and create new elements with name of newid
+        $.each($("#tab_logic tbody tr:nth(0) td"), function() {
+            var cur_td = $(this);
+            
+            var children = cur_td.children();
+            
+            // add new td and element if it has a nane
+            if ($(this).data("name") != undefined) {
+                var td = $("<td></td>", {
+                    "data-name": $(cur_td).data("name")
+                });
+                
+                var c = $(cur_td).find($(children[0]).prop('tagName')).clone().val("");
+                c.attr("name", $(cur_td).data("name") + newid);
+                c.appendTo($(td));
+                td.appendTo($(tr));
+            } else {
+                var td = $("<td></td>", {
+                    'text': $('#tab_logic tr').length
+                }).appendTo($(tr));
+            }
+        });
+        
+        // add delete button and td
+        /*
+        $("<td></td>").append(
+            $("<button class='btn btn-danger glyphicon glyphicon-remove row-remove'></button>")
+                .click(function() {
+                    $(this).closest("tr").remove();
+                })
+        ).appendTo($(tr));
+        */
+        
+        // add the new row
+        $(tr).appendTo($('#tab_logic'));
+        
+        $(tr).find("td button.row-remove").on("click", function() {
+             $(this).closest("tr").remove();
+        });
+});
 
-      $('#tab_logic').append('<tr id="addr'+(i+1)+'"></tr>');
-      i++; 
-  });
-     $("#delete_row").click(function(){
-    	 if(i>1){
-		 $("#addr"+(i-1)).html('');
-		 i--;
-		 }
-	 });
 
+
+    $("#add_row").trigger("click");
 });
 </script>
 {% endblock %}
