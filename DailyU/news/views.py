@@ -5,7 +5,8 @@ from django.template import RequestContext
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from .models import Category, User
-#from el_pagination.views import AjaxListView
+from el_pagination.views import AjaxListView
+from el_pagination.decorators import page_template
 from .webhoseUtil import WebhoseUtil
 import os
 import sys
@@ -71,15 +72,15 @@ def newspaperIndex(request):
     sections = cur_user.getUserCates()
     return render(request, "sections.html", {'sections':sections})
 
-def generateNewspaper(request,section_name):#,page_template='post_list_page.html'):
+@page_template('post_list_page.html')
+def generateNewspaper(request,section_name,extra_context=None):
     wh = WebhoseUtil()
     '''For development purpose, load existing json'''
-    #print(section_name)
     #wh.request(section_name)
     file_path = os.path.join(os.path.dirname(__file__), 'test_jsons/'+section_name+'.json')
     wh.loadJson(file_path)
     posts = []
-    for i in range(10):
+    for i in range(40):
         title = wh.getTitle(i)
         post_url = wh.getUrl(i)
         img = wh.getImg(i)
@@ -94,10 +95,8 @@ def generateNewspaper(request,section_name):#,page_template='post_list_page.html
     context = {
         'posts': posts,
         'section_name':section_name,
-        #'page_template': page_template,
+        'page_template': page_template,
     }
-#     if request.is_ajax():
-#         template = page_template
-    return render_to_response(
-        "post_list.html", context, request)
-    #return render(request, "post_list.html", {'posts': posts, 'section_name':section_name})
+    if extra_context is not None:
+        context.update(extra_context)
+    return render(request, "post_list.html", context)

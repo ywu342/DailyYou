@@ -6,22 +6,23 @@
         </div>
 
 
-<div class="content container">
+<div class="content container" >
     <div class="row">
         <div class="col-md-8">
-            {% for post in posts %}
-            <div class="post">
-                <div class="date">
-                <p>published: {{ post.pub_time }}</p>
-                </div>
-                <h1><a href="{{ post.post_url }}">{{ post.title }}</a></h1>
-                <p>{{ post.text|linebreaksbr }}</p>
-            </div>
-            {% endfor %}
+{% include page_template %}
         </div>
     </div>
 </div>
+{% endblock %}
 
-
-
+{% block js %}
+    {{ block.super }}
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+    <script src="{{ STATIC_URL }}el-pagination/js/el-pagination.js"></script>
+    <script>
+        $.endlessPaginate({
+            paginateOnScroll: true,
+            paginateOnScrollMargin: 200
+        });
+    </script>
 {% endblock %}

@@ -5,7 +5,7 @@ from fileinput import filename
 class WebhoseUtil():
     
     def __init__(self):
-        webhoseio.config(token="b1f36fd9-527a-4fba-aa07-e87606333561")
+        webhoseio.config(token="86b3b0d7-10fa-4025-b410-6898f9019d7d")
         self.output = None
 
     def request(self, category):
