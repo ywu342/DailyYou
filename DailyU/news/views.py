@@ -41,7 +41,7 @@ def index(request):
     print('***************test dbutils***************\n'+','.join(u.getUserCates()))
     u.rmCateFromUser('sports')
     output = ','.join(u.getUserCates())
-    return render(request,"home.html",{'user':user})
+    return render(request,"home.html",{'user':user,'categories':user.getUserCates()})
 
 def login(request):
     username = request.POST.get('username',False)
@@ -58,20 +58,27 @@ def login(request):
         print(e)
     return render(request, "login.html")
 
+def logout(request):
+    del request.session['current_user']
+    return HttpResponseRedirect("/login")
+
 
 def editCategory(request):
     username = request.session.get('current_user',None)
     user = User.objects.get(username=username)
-    edit_type = ''
     if 'add_cat' in request.POST:
         new_category_name = request.POST.get('new_cat',False)
         if len(Category.objects.filter(cate_name=new_category_name)) == 0:
             new_category = Category.objects.create(cate_name=new_category_name)
-        user.addCateToUser(new_category_name)
+        if not new_category_name in user.getUserCates():
+            user.addCateToUser(new_category_name)
         return HttpResponseRedirect("/")
         
     elif 'delete_cat' in request.POST:
-        delete_cat_name = request.POST.get('new_cat',False)
+        delete_cat_name = request.POST.get('current_cate',False)
+        user.rmCateFromUser(delete_cat_name)
+        return HttpResponseRedirect("/")
+
 
 
     return render(request, "home.html")
