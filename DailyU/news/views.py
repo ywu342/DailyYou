@@ -76,6 +76,7 @@ def editCategory(request):
         
     elif 'delete_cat' in request.POST:
         delete_cat_name = request.POST.get('current_cate',False)
+        print(delete_cat_name)
         user.rmCateFromUser(delete_cat_name)
         return HttpResponseRedirect("/")
 
