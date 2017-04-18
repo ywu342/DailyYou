@@ -7,6 +7,9 @@ from .models import Category, User
 from el_pagination.views import AjaxListView
 from el_pagination.decorators import page_template
 from .webhoseUtil import WebhoseUtil
+from .twi_util import *
+from . import word_util
+from textblob import TextBlob as tb
 import os
 import sys
 from lib2to3.fixes.fix_input import context
@@ -69,10 +72,10 @@ def editCategory(request):
     user = User.objects.get(username=username)
     if 'add_cat' in request.POST:
         new_category_name = request.POST.get('new_cat',False)
-        if len(Category.objects.filter(cate_name=new_category_name)) == 0:
-            new_category = Category.objects.create(cate_name=new_category_name)
-        if not new_category_name in user.getUserCates():
-            user.addCateToUser(new_category_name)
+        if len(Category.objects.filter(cate_name=new_category_name)) != 0:
+            #new_category = Category.objects.create(cate_name=new_category_name)
+            if not new_category_name in user.getUserCates():
+                user.addCateToUser(new_category_name)
         return HttpResponseRedirect("/")
         
     elif 'delete_cat' in request.POST:
@@ -124,6 +127,8 @@ def generateNewspaper(request,section_name,extra_context=None):
     file_path = os.path.join(os.path.dirname(__file__), 'test_jsons/'+section_name+'.json')
     wh.loadJson(file_path)
     posts = []
+    titles = []
+    texts = []
     for i in range(wh.numOfPosts()):
         title = wh.getTitle(i)
         post_url = wh.getUrl(i)
@@ -131,12 +136,19 @@ def generateNewspaper(request,section_name,extra_context=None):
         text = wh.getText(i)
         author = wh.getAuthor(i)
         pub_time = wh.getPubTime(i)
+        titles.append(title)
+        texts.append(tb(text))
         posts.append({"title": title,
                       "post_url": post_url,
                       "text": text,
                       "author": author,
                       "pub_time": pub_time,
                       "img" : img})
+
+    tweets = getTweets(texts[:10],titles[:10])
+    for i in range(10):
+        posts[i]["tweets"] = tweets[i]
+    
     context = {
         'posts': posts,
         'sections' : sections,
@@ -146,3 +158,17 @@ def generateNewspaper(request,section_name,extra_context=None):
     if extra_context is not None:
         context.update(extra_context)
     return render(request, "post_list.html", context)
+
+def getTweets(text_list,title_list):
+    sorted_title_list= word_util._sort_words(text_list,title_list)
+    tw = twi_util()
+    tw.appAuth_api()
+    tw_for_section = []
+    for title in sorted_title_list:
+        raw_tw =tw.get_all_related_tweets(title,100,100)
+        filtered = list(tw.most_relevant(raw_tw,4))
+        tw_for_section.append(filtered)
+    return tw_for_section
+
+
+

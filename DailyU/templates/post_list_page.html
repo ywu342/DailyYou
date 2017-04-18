@@ -1,5 +1,5 @@
 {% load el_pagination_tags %}
-
+<script src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>
 <div class="col-md-12">
 {% paginate posts %}
 
@@ -21,6 +21,25 @@
 		    </div>
 		</div>
     </div>
+
+    <div class="row tweets">
+    	
+    	<div class = "row" style="height: 300px;overflow: hidden;">
+    		{% for tweet in post.tweets %}
+    		<div class="col-md-3">
+    			<blockquote class="twitter-tweet"><p>{{tweet|linebreaksbr}}</p> </blockquote>
+    		</div>
+
+    		{% empty%}
+    			<div class="col-md-3">
+    				<p>blablabla</p>
+    			</div>
+
+    		{% endfor%}
+    	</div>
+
+    </div>
+
     {% empty %}
         <div class="jumbotron">
             <h1>Oops No news for this category</h1>
