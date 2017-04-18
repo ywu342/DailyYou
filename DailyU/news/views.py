@@ -9,6 +9,7 @@ from el_pagination.decorators import page_template
 from .webhoseUtil import WebhoseUtil
 import os
 import sys
+from lib2to3.fixes.fix_input import context
 
 
 # Create your views here.
@@ -84,8 +85,15 @@ def editCategory(request):
 
     return render(request, "home.html")
 
-def downloadPDF(request):
-    return HttpResponse("download pdf page")
+def newspaper_archive(request):
+    user = getCurrentUser(request)
+    pdfs = []
+    #pdfs.append(object)
+    context = {
+        'user': user,
+        "pdfs":pdfs,
+    }
+    return render(request, "archive.html",context)
 
 def newspaperIndex(request):
     cur_user = getCurrentUser(request)

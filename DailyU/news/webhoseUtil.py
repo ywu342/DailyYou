@@ -13,7 +13,9 @@ class WebhoseUtil():
         yesterday_string = yesterday.strftime("%s")
         #print(yesterday_string)
         q = "language:(english) performance_score:>4 (site_type:news) site_category:"+category
-        self.output = webhoseio.query("filterWebData", {"q":q, "sort":"performance_score", "latest":"true"})
+        #self.output = webhoseio.query("filterWebData", {"q":q, "sort":"performance_score", "latest":"true"})
+        #"sort":"relevancy",
+        self.output = webhoseio.query("filterWebData", {"q":q, "sort":"relevancy","latest":"true"})
         return self.output
     
     def numOfPosts(self):

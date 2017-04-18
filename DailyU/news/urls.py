@@ -11,5 +11,6 @@ urlpatterns = [
     url(r'^logout/', views.logout,name='logout'),
     url(r'^posts/$',views.newspaperIndex,name='sections'),
     url(r'^posts/(?P<section_name>[\w\-]+)/$',views.generateNewspaper,name='posts'),
+    url(r'^archive/$',views.newspaper_archive,name='archive'),
     url(r'^editcat/', views.editCategory, name='editcat')
 ]
