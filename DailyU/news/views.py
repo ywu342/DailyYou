@@ -122,9 +122,9 @@ def html_to_pdf_directly(request):
                           "pub_time": pub_time,
                           "img" : img})
      
-        tweets = ""#getTweets(texts[:10],titles[:10])
-        for i in range(10):
-            posts[section_name][i]["tweets"] = tweets
+#         tweets = ""#getTweets(texts[:10],titles[:10])
+#         for i in range(min(10,wh.numOfPosts())):
+#             posts[section_name][i]["tweets"] = tweets
          
     context = {
         'posts': posts,
