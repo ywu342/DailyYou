@@ -17,6 +17,7 @@ from lib2to3.fixes.fix_input import context
 from reportlab.pdfgen import canvas
 from easy_pdf.rendering import *
 import datetime
+import re
 
 
 # Create your views here.
@@ -217,9 +218,31 @@ def generateNewspaper(request,section_name,extra_context=None):
                       "pub_time": pub_time,
                       "img" : img})
 
-    #tweets = getTweets(texts[:10],titles[:10])
-    for i in range(10):
-        posts[i]["tweets"] = ""#tweets[i]
+
+    current_time = datetime.datetime.now().strftime("%y-%m-%d_%H:%M")
+    tw_file_path = os.path.join(os.path.dirname(__file__), 'saved_tweets/')
+    r = re.compile(r"^"+section_name+".*")
+    f = os.listdir(tw_file_path)
+    get_file = list(filter(r.match,f))
+    if get_file != [] and saved_tw_not_expired(current_time,get_file[0]):
+        file_path = os.path.join(os.path.dirname(__file__), 'saved_tweets/')
+        filename = get_file[0]
+        with open(filename,'r') as f:
+            for line in f:
+                posts[i]["tweets"] = line
+        f.close()
+
+    else:
+        
+        filename = section_name+"&"+current_time
+        tweets = getTweets(texts,titles,3)
+        with open(filename,'w') as f:
+            for i in range(len(posts)):
+                f.write(tweets[i]+'\n')
+                posts[i]["tweets"] = tweets[i]
+        f.close()
+
+
     
     context = {
         'posts': posts,
@@ -231,16 +254,25 @@ def generateNewspaper(request,section_name,extra_context=None):
         context.update(extra_context)
     return render(request, "post_list.html", context)
 
-def getTweets(text_list,title_list):
+def getTweets(text_list,title_list,return_num):
     sorted_title_list= word_util._sort_words(text_list,title_list)
     tw = twi_util()
     tw.appAuth_api()
     tw_for_section = []
     for title in sorted_title_list:
-        raw_tw =tw.get_all_related_tweets(title,100,100)
-        filtered = list(tw.most_relevant(raw_tw,4))
+        raw_tw =tw.get_all_related_tweets(title,5)
+        filtered = list(tw.most_relevant(raw_tw,return_num))
         tw_for_section.append(filtered)
     return tw_for_section
 
 
+
+def saved_tw_not_expired(c_time,filename):
+
+    archive_time = filename.split('&')[1]
+    t_dif = datetime.datetime.strptime(c_time,"%y-%m-%d_%H:%M") - datetime.datetime.strptime(archive_time,"%y-%m-%d_%H:%M")
+    t_in_hours = t_dif.seconds/3600
+    if(t_in_hours > 2):
+        return False
+    return True
 
