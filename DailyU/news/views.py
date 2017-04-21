@@ -84,7 +84,7 @@ def editCategory(request):
         
     elif 'delete_cat' in request.POST:
         delete_cat_name = request.POST.get('current_cate',False)
-        print(delete_cat_name)
+        print("Deleted cate: "+delete_cat_name)
         user.rmCateFromUser(delete_cat_name)
         return HttpResponseRedirect("/")
 
@@ -177,9 +177,9 @@ def newspaperIndex(request):
     wh = WebhoseUtil()
     for s in sections:
         '''For development purpose, load existing json'''
-        #wh.request(s)
+        wh.request(s)
         file_path = os.path.join(os.path.dirname(__file__), 'test_jsons/'+s+'.json')
-        #wh.saveToFile(file_path)
+        wh.saveToFile(file_path)
         wh.loadJson(file_path)
         text = ""
         for i in range(min(10,wh.numOfPosts())):
@@ -201,7 +201,7 @@ def generateNewspaper(request,section_name,extra_context=None):
     posts = []
     titles = []
     texts = []
-    for i in range(wh.numOfPosts()):
+    for i in range(min(wh.numOfPosts(),50)):
         title = wh.getTitle(i)
         post_url = wh.getUrl(i)
         img = wh.getImg(i)
