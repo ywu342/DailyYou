@@ -1,8 +1,9 @@
 from django.shortcuts import render,redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from django.http import HttpResponseRedirect
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import FileSystemStorage
 from .models import Category, User
 from el_pagination.views import AjaxListView
 from el_pagination.decorators import page_template
@@ -120,9 +121,9 @@ def html_to_pdf_directly(request):
                           "pub_time": pub_time,
                           "img" : img})
      
-        #tweets = getTweets(texts[:10],titles[:10])
+        tweets = ""#getTweets(texts[:10],titles[:10])
         for i in range(10):
-            posts[section_name][i]["tweets"] = "blah"
+            posts[section_name][i]["tweets"] = tweets
          
     context = {
         'posts': posts,
@@ -143,14 +144,31 @@ def html_to_pdf_directly(request):
     return response
 
 def newspaper_archive(request):
-    user = getCurrentUser(request)
+    cur_user = getCurrentUser(request)
+    folder_path = 'static/pdfs/'+cur_user.username+'/'
+    pdfs_com = os.listdir(folder_path)
     pdfs = []
-    #pdfs.append(object)
+    for p in pdfs_com:
+        pdfs.append(p.split('.')[0])
+    #print(pdfs)
     context = {
-        'user': user,
+        'user': cur_user,
         "pdfs":pdfs,
     }
     return render(request, "archive.html",context)
+
+def view_pdf(request,pdf_name):
+    cur_user = getCurrentUser(request)
+    folder_path = 'static/pdfs/'+cur_user.username+'/'
+    fs = FileSystemStorage()
+    filename = folder_path+pdf_name+'.pdf'
+    if fs.exists(filename):
+        with fs.open(filename) as pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = 'filename="'+filename+'"'
+            return response
+    else:
+        return HttpResponseNotFound('The requested pdf was not found in our server.')
 
 def newspaperIndex(request):
     cur_user = getCurrentUser(request)
@@ -199,9 +217,9 @@ def generateNewspaper(request,section_name,extra_context=None):
                       "pub_time": pub_time,
                       "img" : img})
 
-    tweets = getTweets(texts[:10],titles[:10])
+    #tweets = getTweets(texts[:10],titles[:10])
     for i in range(10):
-        posts[i]["tweets"] = tweets[i]
+        posts[i]["tweets"] = ""#tweets[i]
     
     context = {
         'posts': posts,
