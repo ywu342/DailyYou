@@ -3,6 +3,7 @@ import pandas as pd
 import re
 import sys
 import os
+import datetime
 
 def words_in_text(words,text):
         text = text.lower()
@@ -54,19 +55,18 @@ class twi_util():
             except tp.TweepError as e:
                 print("error: " + str(e))
                 break
-        print("Done")
+        #print("Done")
 
         return result
 
-    def get_all_related_tweets(self,word_list,maxTweets,tweetsPerQry,textonly=True,):
-        if tweetsPerQry > maxTweets:
-            tweetsPerQry = maxTweets
+    def get_all_related_tweets(self,word_list,tw_per_word,textonly=True,):
+        if len(word_list) == 0:
+            return []
         result_list = []
         self.keyword_list = word_list
-        tw_per_word = maxTweets/len(word_list)
-
+        
         for word in word_list:
-            tweets_json = self.search_keyword(word,tw_per_word,tweetsPerQry)
+            tweets_json = self.search_keyword(word,tw_per_word,tw_per_word)
             if textonly:
                 for tw in tweets_json:
                     
@@ -81,6 +81,8 @@ class twi_util():
     
 # This can only be used with textonly
     def most_relevant(self,twlist,return_num):
+        if twlist == []:
+            return []
         num_keywords = len(self.keyword_list)
         wordlist = self.keyword_list
         tweet_df = pd.DataFrame()
@@ -97,8 +99,9 @@ class twi_util():
             else:
                 break
         if len(relevant_tweets) == 0:
-                return twlist[:(return_num//2)]+twlist[-(return_num//2):]
+            return twlist[:(return_num//2+return_num%2)]+twlist[-(return_num//2):]
         return relevant_tweets[:return_num]
+
 
 
 

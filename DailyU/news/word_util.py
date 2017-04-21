@@ -36,7 +36,7 @@ def _sort_words(news_list,title_list):
         sorted_list.append(sorted_title)
     return sorted_list
 
-
+'''
 title_list = ['Google Reaches Deal With Russia Over Android',
              'Apple is having trouble getting the iPhone 8’s signature feature to actually work',
               'Genji is coming to Heroes of the Storm',
@@ -80,3 +80,4 @@ news_list.append(tb("Ahead of the phone's commercial launch later this week, Sam
                     launch the camera, or open a favorite app. According to a post at XDA Developers, a new Galaxy S8 firmware update from Samsung now\
                     shuts down the ability to remap the Bixby button. Previously, the button's command was 'intercepted' by the Accessibility Services built\
                     into Android."))
+'''
