@@ -1,7 +1,7 @@
 {% load el_pagination_tags %}
 <script src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>
 <div class="col-md-12">
-{% paginate posts %}
+{% paginate 10 posts %}
 
     {% for post in posts %}
     <div class="row post">

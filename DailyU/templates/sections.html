@@ -19,6 +19,12 @@
         </div>
 {% endfor %}
 </div>
-<button type="button" class="btn btn-primary btn-default save" style="margin-right: 40px;margin-bottom: 50px;">Archive Today's Newspaper</button>
+<a type="button" href="{% url 'save' %}" class="btn btn-primary btn-default save" style="margin-right: 40px;margin-bottom: 50px;">Archive Today's Newspaper</a>
 
+{% endblock %}
+
+{% block javascript %}
+
+<script>
+</script>
 {% endblock %}

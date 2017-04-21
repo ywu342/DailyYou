@@ -13,6 +13,9 @@ from textblob import TextBlob as tb
 import os
 import sys
 from lib2to3.fixes.fix_input import context
+from reportlab.pdfgen import canvas
+from easy_pdf.rendering import *
+import datetime
 
 
 # Create your views here.
@@ -87,6 +90,57 @@ def editCategory(request):
 
 
     return render(request, "home.html")
+
+def html_to_pdf_directly(request): 
+    cur_user = getCurrentUser(request)
+    sections = cur_user.getUserCates()
+    wh = WebhoseUtil()
+    posts = {}
+    for section_name in sections:
+        '''For development purpose, load existing json'''
+        #wh.request(section_name)
+        file_path = os.path.join(os.path.dirname(__file__), 'test_jsons/'+section_name+'.json')
+        wh.loadJson(file_path)
+        posts[section_name] = []
+        titles = []
+        texts = []
+        for i in range(min(wh.numOfPosts(),10)):
+            title = wh.getTitle(i)
+            post_url = wh.getUrl(i)
+            img = wh.getImg(i)
+            text = wh.getText(i)
+            author = wh.getAuthor(i)
+            pub_time = wh.getPubTime(i)
+            titles.append(title)
+            texts.append(tb(text))
+            posts[section_name].append({"title": title,
+                          "post_url": post_url,
+                          "text": text,
+                          "author": author,
+                          "pub_time": pub_time,
+                          "img" : img})
+     
+        #tweets = getTweets(texts[:10],titles[:10])
+        for i in range(10):
+            posts[section_name][i]["tweets"] = "blah"
+         
+    context = {
+        'posts': posts,
+        'sections' : sections,
+    }
+    template_name = "news2pdf.html"
+    pdf_response = render_to_pdf_response(request,template_name,context)
+    pdf_content = render_to_pdf(template_name, context)
+    fname = datetime.datetime.now().strftime("%y-%m-%d")+'.pdf'
+    folder_path = 'static/pdfs/'+cur_user.username+'/'#os.path.join(os.path.dirname(__file__),'pdfs/'+cur_user.username+'/')
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
+    f = open(folder_path+fname, "wb")
+    f.write(pdf_content)
+    f.close()
+    response = HttpResponse(pdf_response,content_type='application/pdf')
+    response['Content-Disposition'] = 'filename="'+fname+'"'
+    return response
 
 def newspaper_archive(request):
     user = getCurrentUser(request)

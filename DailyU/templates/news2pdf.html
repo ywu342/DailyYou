@@ -1,0 +1,89 @@
+{% load staticfiles %}
+{% load news_extras %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>DailyYou</title>
+                <!-- Core CSS - Include with every page -->
+                <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+                <link href="//fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+                <link href="{% static 'css/posts.css' %}" rel="stylesheet">
+                </head>
+ 
+                <body>
+                
+{% for section_name in sections %} 
+        <div class="page-header">
+            <h1>Recent <em>{{ section_name }}</em> news</a></h1>
+        </div>
+
+
+<div class="content container" >
+
+
+<script src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<div class="col-md-12">
+
+    {% for post in posts|keyvalue:section_name %}
+    <div class="row post">
+
+        <div >
+            <div class="date">
+                <p>published: {{ post.pub_time }}</p>
+            </div>
+            <h1><a href="{{ post.post_url }}">{{ post.title }}</a></h1>
+            <p>{{ post.text }}</p>
+        </div>
+    </div>
+
+    <div class="row tweets">
+        
+        <div class = "row" style="height: 300px;overflow: hidden;">
+            {% for tweet in post.tweets %}
+            <div class="col-md-3">
+                <blockquote class="twitter-tweet"><p>{{tweet|linebreaksbr}}</p> </blockquote>
+            </div>
+
+            {% empty%}
+                <div class="col-md-3">
+                    <p>blablabla</p>
+                </div>
+
+            {% endfor%}
+        </div>
+
+    </div>
+    
+    {% empty %}
+        <div class="jumbotron">
+            <h1>Oops No news for this category</h1>
+        </div>
+        <p style="page-break-after:always;"></p>
+    {% endfor %}
+
+</div>
+<p style="page-break-after:always;"></p>
+</div>
+{% empty %}
+        <div class="jumbotron">
+            <h1>Oops This Newspaper is empty</h1>
+        </div>
+{% endfor %}
+
+
+                {% block content %}
+                {% endblock %}
+
+<!-- Core Scripts - Include with every page -->
+                    <script src = "{% static 'js/jquery.min.js' %}"></script>
+                    <script src = "{% static 'js/bootstrap.min.js' %}"></script>
+                   
+        {% block javascript %}
+        {% endblock %}
+
+
+            </body>
+        </html>
