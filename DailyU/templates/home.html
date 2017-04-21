@@ -36,21 +36,21 @@
                         <td data-name="cate_name">
                             <input type="text" name='new_cat'  placeholder='Name' class="form-control"/>
                         </td>
-                        
-                        
-    
                     </tr>
 
                 {% for cate in categories %}
     				<tr id="addr"+"{{ forloop.counter }}" data-id= "{{ forloop.counter }}" >
+    				    <form method="post" action="{% url 'editcat' %}">
 						<td data-name="cate_name">
 						    <input type="text" name='current_cate' value="{{ cate }}" class="form-control"/>
 						</td>
 						
     					
+                        {% csrf_token %}
                         <td data-name="del">
                             <button name="delete_cat" type="submit" class='btn btn-danger row-remove'>delete</button>
                         </td>
+                        </form>
 					</tr>
 
 
