@@ -1,8 +1,9 @@
 from django.shortcuts import render,redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotFound
 from django.http import HttpResponseRedirect
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import FileSystemStorage
 from .models import Category, User
 from el_pagination.views import AjaxListView
 from el_pagination.decorators import page_template
@@ -84,7 +85,7 @@ def editCategory(request):
         
     elif 'delete_cat' in request.POST:
         delete_cat_name = request.POST.get('current_cate',False)
-        print(delete_cat_name)
+        print("Deleted cate: "+delete_cat_name)
         user.rmCateFromUser(delete_cat_name)
         return HttpResponseRedirect("/")
 
@@ -121,9 +122,9 @@ def html_to_pdf_directly(request):
                           "pub_time": pub_time,
                           "img" : img})
      
-        #tweets = getTweets(texts[:10],titles[:10])
+        tweets = ""#getTweets(texts[:10],titles[:10])
         for i in range(10):
-            posts[section_name][i]["tweets"] = "blah"
+            posts[section_name][i]["tweets"] = tweets
          
     context = {
         'posts': posts,
@@ -144,14 +145,31 @@ def html_to_pdf_directly(request):
     return response
 
 def newspaper_archive(request):
-    user = getCurrentUser(request)
+    cur_user = getCurrentUser(request)
+    folder_path = 'static/pdfs/'+cur_user.username+'/'
+    pdfs_com = os.listdir(folder_path)
     pdfs = []
-    #pdfs.append(object)
+    for p in pdfs_com:
+        pdfs.append(p.split('.')[0])
+    #print(pdfs)
     context = {
-        'user': user,
+        'user': cur_user,
         "pdfs":pdfs,
     }
     return render(request, "archive.html",context)
+
+def view_pdf(request,pdf_name):
+    cur_user = getCurrentUser(request)
+    folder_path = 'static/pdfs/'+cur_user.username+'/'
+    fs = FileSystemStorage()
+    filename = folder_path+pdf_name+'.pdf'
+    if fs.exists(filename):
+        with fs.open(filename) as pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = 'filename="'+filename+'"'
+            return response
+    else:
+        return HttpResponseNotFound('The requested pdf was not found in our server.')
 
 def newspaperIndex(request):
     cur_user = getCurrentUser(request)
@@ -160,9 +178,9 @@ def newspaperIndex(request):
     wh = WebhoseUtil()
     for s in sections:
         '''For development purpose, load existing json'''
-        #wh.request(s)
+        wh.request(s)
         file_path = os.path.join(os.path.dirname(__file__), 'test_jsons/'+s+'.json')
-        #wh.saveToFile(file_path)
+        wh.saveToFile(file_path)
         wh.loadJson(file_path)
         text = ""
         for i in range(min(10,wh.numOfPosts())):
@@ -184,7 +202,7 @@ def generateNewspaper(request,section_name,extra_context=None):
     posts = []
     titles = []
     texts = []
-    for i in range(wh.numOfPosts()):
+    for i in range(min(wh.numOfPosts(),50)):
         title = wh.getTitle(i)
         post_url = wh.getUrl(i)
         img = wh.getImg(i)
@@ -199,6 +217,7 @@ def generateNewspaper(request,section_name,extra_context=None):
                       "author": author,
                       "pub_time": pub_time,
                       "img" : img})
+
 
     current_time = datetime.datetime.now().strftime("%y-%m-%d_%H:%M")
     tw_file_path = os.path.join(os.path.dirname(__file__), 'saved_tweets/')
@@ -222,6 +241,7 @@ def generateNewspaper(request,section_name,extra_context=None):
                 f.write(tweets[i]+'\n')
                 posts[i]["tweets"] = tweets[i]
         f.close()
+
 
     
     context = {
