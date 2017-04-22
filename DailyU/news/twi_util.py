@@ -43,7 +43,7 @@ class twi_util():
         tw_count = 0
         while tw_count < maxTweets:
             try:
-                new_tweets = self.api.search(q=word,count=tweetsPerQry)
+                new_tweets = self.api.search(q=word+" filter:safe",count=tweetsPerQry,lang='en')
                    
                 if(not new_tweets):
                     print("No more tweets found")

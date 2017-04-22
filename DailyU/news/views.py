@@ -18,6 +18,7 @@ from reportlab.pdfgen import canvas
 from easy_pdf.rendering import *
 import datetime
 import re
+import json
 
 
 # Create your views here.
@@ -202,7 +203,7 @@ def generateNewspaper(request,section_name,extra_context=None):
     posts = []
     titles = []
     texts = []
-    for i in range(min(wh.numOfPosts(),50)):
+    for i in range(min(wh.numOfPosts(),20)):
         title = wh.getTitle(i)
         post_url = wh.getUrl(i)
         img = wh.getImg(i)
@@ -219,28 +220,33 @@ def generateNewspaper(request,section_name,extra_context=None):
                       "img" : img})
 
 
-    current_time = datetime.datetime.now().strftime("%y-%m-%d_%H:%M")
+    current_time = datetime.datetime.now().strftime("%y-%m-%d_%H%M")
     tw_file_path = os.path.join(os.path.dirname(__file__), 'saved_tweets/')
     r = re.compile(r"^"+section_name+".*")
     f = os.listdir(tw_file_path)
     get_file = list(filter(r.match,f))
     if get_file != [] and saved_tw_not_expired(current_time,get_file[0]):
-        file_path = os.path.join(os.path.dirname(__file__), 'saved_tweets/')
-        filename = get_file[0]
+        filename = tw_file_path+'/'+get_file[0]
+        tws = {}
         with open(filename,'r') as f:
-            for line in f:
-                posts[i]["tweets"] = line
+            tws = json.load(f)
         f.close()
+        for i in range(len(posts)):
+
+            posts[i]["tweets"] = tws[str(i)]
+        
 
     else:
         
-        filename = section_name+"&"+current_time
+        filename = tw_file_path+'/'+section_name+"&"+current_time
         tweets = getTweets(texts,titles,3)
-        with open(filename,'w') as f:
-            for i in range(len(posts)):
-                f.write(tweets[i]+'\n')
-                posts[i]["tweets"] = tweets[i]
-        f.close()
+        output = {}
+        for i in range(len(posts)):
+            output[str(i)] = tweets[i]
+            posts[i]["tweets"] = tweets[i]
+        with open(filename,'w') as outfile:
+            json.dump(output,outfile)
+        outfile.close()
 
 
     
@@ -260,7 +266,7 @@ def getTweets(text_list,title_list,return_num):
     tw.appAuth_api()
     tw_for_section = []
     for title in sorted_title_list:
-        raw_tw =tw.get_all_related_tweets(title,5)
+        raw_tw =tw.get_all_related_tweets(title,6)
         filtered = list(tw.most_relevant(raw_tw,return_num))
         tw_for_section.append(filtered)
     return tw_for_section
@@ -270,7 +276,7 @@ def getTweets(text_list,title_list,return_num):
 def saved_tw_not_expired(c_time,filename):
 
     archive_time = filename.split('&')[1]
-    t_dif = datetime.datetime.strptime(c_time,"%y-%m-%d_%H:%M") - datetime.datetime.strptime(archive_time,"%y-%m-%d_%H:%M")
+    t_dif = datetime.datetime.strptime(c_time,"%y-%m-%d_%H%M") - datetime.datetime.strptime(archive_time,"%y-%m-%d_%H%M")
     t_in_hours = t_dif.seconds/3600
     if(t_in_hours > 2):
         return False

@@ -9,8 +9,8 @@ class WebhoseUtil():
         self.output = None
 
     def request(self, category):
-        yesterday = datetime.date.today() - datetime.timedelta(days=1)
-        yesterday_string = yesterday.strftime("%s")
+        #yesterday = datetime.date.today() - datetime.timedelta(days=1)
+        #yesterday_string = yesterday.strftime("%s")
         #print(yesterday_string)
         q = "language:(english) thread.country:US performance_score:>4 (site_type:news) site_category:"+category
         #self.output = webhoseio.query("filterWebData", {"q":q, "sort":"performance_score", "latest":"true"})

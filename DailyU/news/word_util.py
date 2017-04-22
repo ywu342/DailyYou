@@ -2,10 +2,12 @@ from textblob import TextBlob as tb
 import numpy as np
 import math
 
+tag_filter = ['CC','PRP','AT','CD','DT','TO','IN']
 
 def _getNouns(title):
     tags = tb(title).tags
-    nouns = [t[0] for t in tags if t[1] == 'NNP' or t[1] == 'NN' ]
+    #nouns = [t[0] for t in tags if t[1] == 'NNP' or t[1] == 'NN' ]
+    nouns = [t[0] for t in tags if not t[1] in tag_filter ]
     return nouns
     
 def tf(word,blob):
