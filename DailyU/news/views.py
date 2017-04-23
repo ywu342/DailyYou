@@ -274,11 +274,12 @@ def getTweets(text_list,title_list,return_num):
 
 
 def saved_tw_not_expired(c_time,filename):
-
+    tw_file_path = os.path.join(os.path.dirname(__file__), 'saved_tweets/')
     archive_time = filename.split('&')[1]
     t_dif = datetime.datetime.strptime(c_time,"%y-%m-%d_%H%M") - datetime.datetime.strptime(archive_time,"%y-%m-%d_%H%M")
     t_in_hours = t_dif.seconds/3600
     if(t_in_hours > 2):
+        os.unlink(tw_file_path+'/'+filename)
         return False
     return True
 
