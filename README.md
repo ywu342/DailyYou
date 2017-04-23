@@ -6,3 +6,6 @@ CS 6365 Intro to Enterprise Computing Project
 * https://bitbucket.org/rptlab/reportlab
 * https://github.com/xhtml2pdf/xhtml2pdf
 * http://django-easy-pdf.readthedocs.io/en/latest/installation.html
+* pip install textblob
+* pip install pandas
+* pip install tweepy
